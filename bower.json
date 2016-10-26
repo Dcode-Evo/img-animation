@@ -1,7 +1,7 @@
 {
   "name": "img-animation",
   "description": "Animate a sequence of images",
-  "main": "index.js",
+  "main": "./imgAnimation.js",
   "authors": [
     "Aleksei Polechin (http://alek.be)"
   ],

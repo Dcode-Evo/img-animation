@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Demo img-animation</title>
+	<style>
+		#anim {
+			z-index: -1;
+			position: relative;
+		}
+		#anim img {
+			display: none;
+		}
+		#anim img.active{
+			display: block;
+			position: absolute;
+			top: 0;
+			left:0;
+		}
+	</style>
+</head>
+<body ng-app="testApp">
+	<div ng-controller="MainCtrl">
+		<div id="anim" img-animation images="images" start="startAnim" duration="2500">
+			<img class="active" src="images/0000.png" alt=" "/>
+		</div>
+
+		<input type="checkbox" ng-model="startAnim">
+	</div>
+
+	<script src="js/angular.min.js"></script>
+	<script src="js/app.js"></script>
+	<script src="../imgAnimation.js"></script>
+	<script src="js/controllers/main.js"></script>
+</body>
+</html>
