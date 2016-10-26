@@ -1,0 +1,23 @@
+{
+  "name": "img-animation",
+  "description": "Animate a sequence of images",
+  "main": "index.js",
+  "authors": [
+    "Aleksei Polechin (http://alek.be)"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/Dcode-Evo/img-sequence-animation",
+  "private": true,
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    ".gitignore",
+    "test",
+    "tests",
+    "demo"
+  ]
+}
