@@ -2,6 +2,7 @@
   "name": "img-animation",
   "description": "Animate a sequence of images",
   "main": "./imgAnimation.js",
+  "version": "1.0.1",
   "authors": [
     "Aleksei Polechin (http://alek.be)"
   ],
