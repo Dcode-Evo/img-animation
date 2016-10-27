@@ -4,33 +4,35 @@
 	<meta charset="UTF-8">
 	<title>Demo img-animation</title>
 	<style>
-		#anim {
+		.anim {
 			z-index: -1;
 			position: relative;
+			transform: scale(.2);
+			height: 300px;
 		}
-		#anim img {
+
+		.anim img {
 			display: none;
 		}
-		#anim img.active{
+
+		.anim img.active, .anim img.static {
 			display: block;
 			position: absolute;
 			top: 0;
-			left:0;
+			left: 0;
 		}
 	</style>
 </head>
 <body ng-app="testApp">
-	<div ng-controller="MainCtrl">
-		<div id="anim" img-animation images="images" start="startAnim" duration="2500">
-			<img class="active" src="images/0000.png" alt=" "/>
-		</div>
+<div class="anim" img-animation duration="2500" start="startAnim">
+	<img class="static" src="images/0001.png" alt=" "/>
+	<anim-frame ng-repeat="n in [] | animFrames:32" src="{{ 'images/' + n + '.png'}}"></anim-frame>
+</div>
 
-		<input type="checkbox" ng-model="startAnim">
-	</div>
+<input type="checkbox" ng-model="startAnim">
 
-	<script src="js/angular.min.js"></script>
-	<script src="js/app.js"></script>
-	<script src="../imgAnimation.js"></script>
-	<script src="js/controllers/main.js"></script>
+<script src="js/angular.min.js"></script>
+<script src="js/app.js"></script>
+<script src="../imgAnimation.js"></script>
 </body>
 </html>

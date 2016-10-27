@@ -6,143 +6,230 @@
  * @description
  * # animation for a sequence of images
  */
+(function (window, angular, undefined) {
 
-angular.module('imgAnimation', [])
+	angular.module('imgAnimator', [])
 
-	.directive('imgAnimation', ['imgAnimation', 'preloader', function (imgAnimation, preloader) {
-		return {
-			restrict: 'A',
-			scope: {
-				"images": "=",
-				"duration": "=",
-				"start": "=",
-				"loop": "="
-			},
+		/**
+		 * @ngdoc directive
+		 * @name imgAnimation
+		 * @description
+		 * Main directive that prepares the animation
+		 * when the page is completely loaded (images/css/...)
+		 * it starts preloading the frames of the animation
+		 * When all images are loaded it places the loaded int launcher the imgAnimationFactory
+		 * If one of the frame (image) cant be loaded, the animation is aborted to avoid a missing
+		 * frame make the animation blink.
+		 */
+		.directive('imgAnimation', ['$window', 'imgAnimationFactory', 'preloader', function ($window, imgAnimationFactory, preloader) {
+			return {
+				restrict: 'A',
+				scope: {
+					"duration": "=",
+					"start": "=",
+					"loop": "=",
+					"mobile": "="
+				},
+				controller: function ($scope, $element, $attrs) {
+					$scope.images = [];
 
-			link: function postLink(scope, element, attrs) {
+					this.addImage = function (attrs) {
+						$scope.images.push(attrs.src);
+					};
+				},
 
-				var animation;
+				link: function ($scope, $element, $attrs) {
+					var animation;
+					var init = function () {
 
-				document.body.onload = function () {
+						// if mobile="false" or not set 
+						// we disable the animation on small screens
+						// provide an explicit mobile="true" to make animation available on small screens
+						if (!$scope.mobile) {
+							if (console)
+								console.log("Mobile device, animation is disabled");
+							if ($window.innerWidth < 768) {
+								// we remove the frames
+								$element.find('anim-frame').remove();
+								// and prevent initialisation
+								// so the images are not loaded
+								return;
+							}
+						}
 
-					if(window.console)
-						console.log("Start preloading animation images");
+						// default animation settings if not provided
+						var animationOptions = {
+							loop: $scope.loop || "reverse",
+							duration: $scope.duration || 2000
+						};
 
-					preloader.preloadImages(scope.images).then(
-						function handleResolve() {
-							// Loading was successful.
+						if (window.console)
+							console.log("Start preloading animation images");
 
-							/** Create animation instance **/
-							var options = {
-								loop: scope.loop || "reverse",
-								duration: scope.duration || 2000
-							};
-							animation = new imgAnimation(angular.element(element), scope.images, options);
-							animation.start();
+						// preload all images before starting the animation
+						// if one image fails to load, abort animation
+						preloader.preloadImages($scope.images).then(
+							function handleResolve() {
+								// Loading was successful.
+								if (window.console)
+									console.log("All animation frames were loaded");
 
-							scope.$watch('start', function (value) {
-								if (!value) {
-									animation.stop();
-								}
-								else {
+								/** Create animation instance **/
+								animation = new imgAnimationFactory(angular.element($element), $scope.images, animationOptions);
+								if ($scope.start) {
+									if (window.console)
+										console.log("Starting animation");
 									animation.start();
 								}
-							});
-						},
-						function handleReject(imageLocation) {
-							// Loading failed on at least one image.
-							console.log(imageLocation + ' could not be loaded.');
+							},
+							function handleReject(imageLocation) {
+								// Loading failed on at least one image.
+								console.log(imageLocation + ' could not be loaded. Animation Aborted.');
+							}
+						);
+					};
+
+					// we start the initialisation and loading of the images 
+					// only when the content of the page is loaded 
+					$window.onload = function () {
+						init();
+					};
+
+					// watch the value of the start attribute to stop/start the animation
+					$scope.$watch('start', function (value) {
+						if (!animation)
+							return;
+
+						if (!value) {
+							animation.stop();
 						}
-					);
+						else {
+							animation.start();
+						}
+					});
 				}
-
 			}
-		}
-	}])
+		}])
 
-	.factory('imgAnimation', function () {
-
-		var ImgAnimation = function (element, images, options) {
-			var self = this,
-				_forward = true,
-				_current = 0,
-				allImages,
-				frames = images.length;
-
-			if (!element) {
-				console.error('Element to animate is not set');
-				return;
-			}
-			if (!images) {
-				console.error('No images to animate');
-				return;
-			}
-
-			for (var i = 1; i < frames; i++) {
-				element.append('<img src="' + images[i] + '" alt="" />');
-			}
-			allImages = element.find('img');
-
-			var start = function () {
-				self.animation = setInterval(function () {
-					_animate();
-				}, options.duration / frames);
-			};
-
-			var stop = function () {
-				clearInterval(self.animation);
-				if(window.console)
-					console.info('Animation removed');
-			};
-
-			var _animate = function () {
-				var active = _current;
-
-				if (_forward) {
-					_current++;
-				}
-				else if (options.loop == "reverse") {
-					_current--;
-				}
-				if (_forward && _current == frames - 1) {
-					if (options.loop === "reverse") {
-						_forward = false;
-					}
-					if (options.loop === true) {
-						_current = 0;
-					}
-				}
-				if (!_forward && _current == 0) {
-					_forward = true;
-				}
-
-				angular.element(allImages[active]).removeClass('active');
-				angular.element(allImages[_current]).addClass('active');
-			};
-
+		/**
+		 * @ngdoc directive
+		 * @name animFrame
+		 * @description
+		 * A frame element that provides images sources for the images to preload
+		 * we don't use the img tag to avoid the browser to download images while
+		 * the page is loading, so the user can see the content faster
+		 */
+		.directive('animFrame', ['$timeout', function ($timeout) {
 			return {
-				start: start,
-				stop: stop
+				restrict: 'E',
+				require: "^imgAnimation",
+				link: function postLink(scope, element, attrs, imgAnimationCtrl) {
+					imgAnimationCtrl.addImage(attrs);
+				}
 			}
-		};
+		}])
 
-		return ImgAnimation;
-	});
+		.filter('animFrames', function () {
+			return function (input, range) {
+				for (var i = 1; i <= parseInt(range, 10); i++) {
+					input.push(("000" + i).slice(-4));
+				}
+				return input;
+			};
+		})
 
-'use strict';
+		/**
+		 * @ngdoc factory
+		 * @name imgAnimationFactory
+		 * @description
+		 * inserts all images in the container
+		 * then animates it
+		 */
+		.factory('imgAnimationFactory', function () {
 
-/**
- * @ngdoc factory
- * @name images preloader
- * @description
- * # preloads a bunch of images with a promise
- * we can know if one of images has failed to act in consequence
- * @source https://www.bennadel.com/blog/2597-preloading-images-in-angularjs-with-promises.htm
- */
-angular.module('imgAnimation')
-	// I provide a utility class for preloading image objects.
-	.factory(
-		"preloader", [
+			return function (element, images, options) {
+				var self = this,
+					forward = true,
+					current = 0,
+					allImages = [],
+					frames = images.length;
+
+				if (!element) {
+					console.error('Element to animate is not set');
+					return;
+				}
+				if (!images) {
+					console.error('No images to animate');
+					return;
+				}
+
+				// remove the static image
+				angular.element(angular.element(element).find('img')).remove();
+
+				// add all frames images
+				for (var i = 0; i < frames; i++) {
+					var image = angular.element('<img ' + (i == 0 ? 'class="active"' : '') + ' src="' + images[i] + '" alt=" " />');
+					allImages.push(image);
+					element.append(image);
+				}
+
+				var start = function () {
+					self.animation = setInterval(function () {
+						animate();
+					}, options.duration / frames);
+				};
+
+				var stop = function () {
+					clearInterval(self.animation);
+					if (window.console)
+						console.info('Animation removed');
+				};
+
+				var animate = function () {
+					var active = current;
+
+					if (forward) {
+						current++;
+					}
+					else if (options.loop == "reverse") {
+						current--;
+					}
+					if (forward && current == frames - 1) {
+						if (options.loop === "reverse") {
+							forward = false;
+						}
+						if (options.loop === true) {
+							current = 0;
+						}
+					}
+					if (!forward && current == 0) {
+						forward = true;
+					}
+
+					angular.element(allImages[active]).removeClass('active');
+					angular.element(allImages[current]).addClass('active');
+				};
+
+				return {
+					start: start,
+					stop: stop
+				}
+			};
+		});
+
+	'use strict';
+
+	/**
+	 * @ngdoc factory
+	 * @name images preloader
+	 * @description
+	 * # preloads a bunch of images with a promise
+	 * we can know if one of images has failed to act in consequence
+	 * @source https://www.bennadel.com/blog/2597-preloading-images-in-angularjs-with-promises.htm
+	 */
+	angular.module('imgAnimator')
+		// I provide a utility class for preloading image objects.
+		.factory("preloader", [
 			"$q",
 			"$rootScope",
 
@@ -377,3 +464,4 @@ angular.module('imgAnimation')
 				return ( Preloader );
 			}]);
 
+})(window, window.angular);
