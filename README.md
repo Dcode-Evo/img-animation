@@ -12,6 +12,10 @@ Note: does not support multiple instances
 
 ## Getting started
 
+```
+bower install https://github.com/Dcode-Evo/img-animation.git --save-dev
+```
+
 Simple as 1, 2, 3
 
 ### 1. Include the module dependency to your app
