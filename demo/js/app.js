@@ -13,7 +13,9 @@ var app;
 	'use strict';
 
 	app = angular.module('testApp', [
-		'imgAnimation'
-	]);
+		'imgAnimator'
+	]).run(function($rootScope){
+		$rootScope.startAnim = true;
+	});
 
 })(window, window.angular);
