@@ -15,19 +15,26 @@ angular.module('imgAnimation', [])
 			scope: {
 				"images": "=",
 				"duration": "=",
-				"start": "="
+				"start": "=",
+				"loop": "="
 			},
 
 			link: function postLink(scope, element, attrs) {
 
 				var animation;
 
+				console.log(scope.loop)
+
 				preloader.preloadImages(scope.images).then(
 					function handleResolve() {
 						// Loading was successful.
 
 						/** Create animation instance **/
-						animation = new imgAnimation(angular.element(element), scope.images, scope.duration);
+						var options = {
+							loop: scope.loop || "reverse",
+							duration: scope.duration || 2000
+						};
+						animation = new imgAnimation(angular.element(element), scope.images, options);
 						animation.start();
 
 						scope.$watch('start', function (value) {
@@ -51,7 +58,7 @@ angular.module('imgAnimation', [])
 
 	.factory('imgAnimation', function () {
 
-		var ImgAnimation = function (element, images, duration) {
+		var ImgAnimation = function (element, images, options) {
 			var self = this,
 				_forward = true,
 				_current = 0,
@@ -75,7 +82,7 @@ angular.module('imgAnimation', [])
 			var start = function () {
 				self.animation = setInterval(function () {
 					_animate();
-				}, duration / frames);
+				}, options.duration / frames);
 			};
 
 			var stop = function () {
@@ -85,18 +92,25 @@ angular.module('imgAnimation', [])
 
 			var _animate = function () {
 				var active = _current;
+
 				if (_forward) {
 					_current++;
 				}
-				else {
+				else if (options.loop == "reverse") {
 					_current--;
 				}
 				if (_forward && _current == frames - 1) {
-					_forward = false;
+					if (options.loop === "reverse") {
+						_forward = false;
+					}
+					if (options.loop === true) {
+						_current = 0;
+					}
 				}
 				if (!_forward && _current == 0) {
 					_forward = true;
 				}
+
 				angular.element(allImages[active]).removeClass('active');
 				angular.element(allImages[_current]).addClass('active');
 			};
