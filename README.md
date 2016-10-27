@@ -6,8 +6,13 @@ This module uses 2 services:
 preloader and imgAnimate
 
 The preloader will preload all images before launching the animation. If one image fails to load the animation will be aborted.
+The preloading starts on `window.onload` so the animation will not impact the page loading/rendering.
+
+Note: does not support multiple instances
 
 ## Getting started
+
+Simple as 1, 2, 3
 
 ### 1. Include the module dependency to your app
 
@@ -17,32 +22,21 @@ app = angular.module('testApp', [
 ]);
 ```
 
-### 2. Define the list of images
-```js
-$scope.images = [
-	"images/0000.png",
-	...
-	"images/0024.png",
-	"images/0025.png"
-];
-```
-
-### 3. Use it in html
+### 2. Use it in html
 
 ```html
 <body ng-app="testApp">
 	...
-	<div ng-controller="MainCtrl">
-		<div id="anim-container" img-animation images="images" start="startAnim" duration="2500">
-			<img class="active" src="images/0000.png" alt=" "/> <!-- The first image to show when the animation is not started/aborted --> 
-		</div>
+	<div class="anim" img-animation duration="2500" start="startAnim">
+		<img class="static" src="images/0001.png" alt=" "/>
+		<anim-frame ng-repeat="n in [] | animFrames:32" src="{{ 'images/' + n + '.png'}}"></anim-frame>
 	</div>
 	...
 </body>
 
 ```
 
-### 4. CSS
+### 3. CSS
 
 This is written in SCSS (SASS) 
 
@@ -63,19 +57,19 @@ $img-height: 200px;
 		width: $img-width; // the size of the image:
 		height: $img-height; // you have to set it to avoid the browser to recalculate all on each frame
 		
-		&.active { // active/visible frame
+		&.active, &.static { // active/visible frame
 			display: block;
 		}
 	}
 }
 ```
 
-## Parameters
-- **images**: {array} the list images paths
-	- the name of files should be a number 0000 -> 0010 (or more)
+## Attributes (Parameters)
 - **startAnim**: {bool}, the animation will start if true, stop if false
 - **duration**: {int} milliseconds, if you have 25 images and want the animation last 1 second set this parameter to 1000
 	- default (2000)
+- **mobile**: false (default), disables the animation on screens smaller than 786px of width
+	- true: enables the animation on mobiles
 - **loop**: {bool|string}
 	- "reverse" (default) : will animate 0 -> 25 -> 0 -> 25 -> ... 
 	- true: wille animate 0 -> 25, 0 -> 25, 0 -> 25, ...
