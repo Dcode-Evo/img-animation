@@ -23,34 +23,38 @@ angular.module('imgAnimation', [])
 
 				var animation;
 
-				console.log(scope.loop)
+				document.body.onload = function () {
 
-				preloader.preloadImages(scope.images).then(
-					function handleResolve() {
-						// Loading was successful.
+					if(window.console)
+						console.log("Start preloading animation images");
 
-						/** Create animation instance **/
-						var options = {
-							loop: scope.loop || "reverse",
-							duration: scope.duration || 2000
-						};
-						animation = new imgAnimation(angular.element(element), scope.images, options);
-						animation.start();
+					preloader.preloadImages(scope.images).then(
+						function handleResolve() {
+							// Loading was successful.
 
-						scope.$watch('start', function (value) {
-							if (!value) {
-								animation.stop();
-							}
-							else {
-								animation.start();
-							}
-						});
-					},
-					function handleReject(imageLocation) {
-						// Loading failed on at least one image.
-						console.log(imageLocation + ' could not be loaded.');
-					}
-				);
+							/** Create animation instance **/
+							var options = {
+								loop: scope.loop || "reverse",
+								duration: scope.duration || 2000
+							};
+							animation = new imgAnimation(angular.element(element), scope.images, options);
+							animation.start();
+
+							scope.$watch('start', function (value) {
+								if (!value) {
+									animation.stop();
+								}
+								else {
+									animation.start();
+								}
+							});
+						},
+						function handleReject(imageLocation) {
+							// Loading failed on at least one image.
+							console.log(imageLocation + ' could not be loaded.');
+						}
+					);
+				}
 
 			}
 		}
@@ -87,7 +91,8 @@ angular.module('imgAnimation', [])
 
 			var stop = function () {
 				clearInterval(self.animation);
-				console.info('Animation removed');
+				if(window.console)
+					console.info('Animation removed');
 			};
 
 			var _animate = function () {
