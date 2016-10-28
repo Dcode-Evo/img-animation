@@ -46,8 +46,6 @@
 						// we disable the animation on small screens
 						// provide an explicit mobile="true" to make animation available on small screens
 						if (!$scope.mobile) {
-							if (console)
-								console.log("Mobile device, animation is disabled");
 							if ($window.innerWidth < 768) {
 								// we remove the frames
 								$element.find('anim-frame').remove();
@@ -63,28 +61,20 @@
 							duration: $scope.duration || 2000
 						};
 
-						if (window.console)
-							console.log("Start preloading animation images");
-
 						// preload all images before starting the animation
 						// if one image fails to load, abort animation
 						preloader.preloadImages($scope.images).then(
 							function handleResolve() {
 								// Loading was successful.
-								if (window.console)
-									console.log("All animation frames were loaded");
-
 								/** Create animation instance **/
 								animation = new imgAnimationFactory(angular.element($element), $scope.images, animationOptions);
 								if ($scope.start) {
-									if (window.console)
-										console.log("Starting animation");
 									animation.start();
 								}
 							},
 							function handleReject(imageLocation) {
 								// Loading failed on at least one image.
-								console.log(imageLocation + ' could not be loaded. Animation Aborted.');
+								throw imageLocation + ' could not be loaded. Animation Aborted.';
 							}
 						);
 					};
@@ -155,12 +145,10 @@
 					frames = images.length;
 
 				if (!element) {
-					console.error('Element to animate is not set');
-					return;
+					throw 'Element to animate is not set';
 				}
 				if (!images) {
-					console.error('No images to animate');
-					return;
+					throw 'No images to animate';
 				}
 
 				// remove the static image
@@ -181,8 +169,6 @@
 
 				var stop = function () {
 					clearInterval(self.animation);
-					if (window.console)
-						console.info('Animation removed');
 				};
 
 				var animate = function () {

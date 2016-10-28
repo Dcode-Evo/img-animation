@@ -1,3 +1,7 @@
+## 1.1.1
+- remove all `console.log` usage
+- use `throw` on blocking events/errors
+
 ## 1.1.0
 - refactor the module
 - add mobile attribute that aborts the animation on small devices 
