@@ -2,9 +2,6 @@
 
 Animates a sequence of images in a loop.
 
-This module uses 2 services: 
-preloader and imgAnimate
-
 The preloader will preload all images before launching the animation. If one image fails to load the animation will be aborted.
 The preloading starts on `window.onload` so the animation will not impact the page loading/rendering.
 
@@ -22,7 +19,7 @@ Simple as 1, 2, 3
 
 ```js
 app = angular.module('testApp', [
-	'imgAnimation'
+	'imgAnimator'
 ]);
 ```
 
@@ -33,7 +30,7 @@ app = angular.module('testApp', [
 	...
 	<div class="anim" img-animation duration="2500" start="startAnim">
 		<img class="static" src="images/0001.png" alt=" "/>
-		<anim-frame ng-repeat="n in [] | animFrames:32" src="{{ 'images/' + n + '.png'}}"></anim-frame>
+		<anim-frame ng-repeat="n in [] | animFrames:42" src="{{ 'images/' + n + '.png'}}"></anim-frame>
 	</div>
 	...
 </body>
@@ -78,3 +75,27 @@ $img-height: 200px;
 	- "reverse" (default) : will animate 0 -> 25 -> 0 -> 25 -> ... 
 	- true: wille animate 0 -> 25, 0 -> 25, 0 -> 25, ...
 	- false: not implemented yet
+	
+## Directives
+
+### img-animation
+
+Has to be placed on the animation container.
+ 
+The container has to contain the first frame of the animation as an `img` tag with class `static`. 
+This image will be loaded with the document and will be displayed until the animation is ready to run. If the animation 
+fails to load, this image will remain in place to not break your design.
+
+### anim-frame
+This directive allows to list all frames of the animation without writing it in a JS. 
+It is used to parse the image path without being loaded when you open the page.
+
+It can be added within ng-repeat using the `animFrames` filter: 
+`ng-repeat="n in [] | animFrames:42"` where: 
+- `42` is the exact number of animation frames
+- `n` is the postfix on the image name `0001`, `0002`, ..., `0042`
+
+In case of the ng-repeat use your images has to be named with the following pattern:  
+- _whatever_0001.png (for the first frame)
+- ...
+- _whatever_0042.png
