@@ -115,6 +115,7 @@
 				require: "^imgAnimation",
 				link: function postLink(scope, element, attrs, imgAnimationCtrl) {
 					imgAnimationCtrl.addImage(attrs);
+					element.remove();
 				}
 			}
 		}])
@@ -162,12 +163,14 @@
 				}
 
 				var start = function () {
+					element.addClass('animation-play');
 					self.animation = setInterval(function () {
 						animate();
 					}, options.duration / frames);
 				};
 
 				var stop = function () {
+					element.removeClass('animation-play');
 					clearInterval(self.animation);
 				};
 

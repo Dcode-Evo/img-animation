@@ -1,3 +1,7 @@
+## 1.1.2
+- add class animation-play when the animation starts 
+- remove anim-frame elements on img insert
+
 ## 1.1.1
 - remove all `console.log` usage
 - use `throw` on blocking events/errors

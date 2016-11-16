@@ -47,21 +47,22 @@ $img-height: 200px;
 
 #anim-container {
 	position: relative;
-	width: $img-width; // the size of the image:
-	height: $img-height; // you have to set it to avoid the browser to recalculate all on each frame
-	
-	img {
-		display: none; // this is hidden cause the frame is not active
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: $img-width; // the size of the image:
-		height: $img-height; // you have to set it to avoid the browser to recalculate all on each frame
-		
-		&.active, &.static { // active/visible frame
-			display: block;
-		}
-	}
+    width: $img-width; // the size of the image:
+    height: $img-height; // you have to set it to avoid the browser to recalculate all on each frame
+    overflow: hidden;
+
+    > img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: $img-width; // the size of the image:
+        height: $img-height; // you have to set it to avoid the browser to recalculate all on each frame
+        @include translate(0, $img-height);
+
+        &.active, &.static { // active/visible frame
+            @include translate(0,0);
+        }
+    }
 }
 ```
 
