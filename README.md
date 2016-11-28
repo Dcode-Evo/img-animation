@@ -30,7 +30,7 @@ app = angular.module('testApp', [
 	...
 	<div class="anim" img-animation duration="2500" start="startAnim">
 		<img class="static" src="images/0001.png" alt=" "/>
-		<anim-frame ng-repeat="n in [] | animFrames:42" src="{{ 'images/' + n + '.png'}}"></anim-frame>
+		<anim-frame ng-repeat="n in [] | animFrames:42" frame-src="{{ 'images/' + n + '.png'}}"></anim-frame>
 	</div>
 	...
 </body>
