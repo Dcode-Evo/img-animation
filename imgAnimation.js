@@ -30,7 +30,7 @@
 					"loop": "=",
 					"mobile": "="
 				},
-				controller: function ($scope, $element, $attrs) {
+				controller: function ($scope) {
 					$scope.images = [];
 
 					this.addImage = function (attrs) {
@@ -38,11 +38,11 @@
 					};
 				},
 
-				link: function ($scope, $element, $attrs) {
+				link: function ($scope, $element) {
 					var animation;
 					var init = function () {
 
-						// if mobile="false" or not set 
+						// if mobile="false" or not set
 						// we disable the animation on small screens
 						// provide an explicit mobile="true" to make animation available on small screens
 						if (!$scope.mobile) {
@@ -79,8 +79,8 @@
 						);
 					};
 
-					// we start the initialisation and loading of the images 
-					// only when the content of the page is loaded 
+					// we start the initialisation and loading of the images
+					// only when the content of the page is loaded
 					$window.onload = function () {
 						init();
 					};
@@ -109,16 +109,17 @@
 		 * we don't use the img tag to avoid the browser to download images while
 		 * the page is loading, so the user can see the content faster
 		 */
-		.directive('animFrame', ['$timeout', function ($timeout) {
+		.directive('animFrame', function () {
 			return {
 				restrict: 'E',
 				require: "^imgAnimation",
 				link: function postLink(scope, element, attrs, imgAnimationCtrl) {
+					attrs.src = attrs.frameSrc;
 					imgAnimationCtrl.addImage(attrs);
 					element.remove();
 				}
 			}
-		}])
+		})
 
 		.filter('animFrames', function () {
 			return function (input, range) {

@@ -1,3 +1,7 @@
+## 1.1.3
+- rename attribute `src` of the anim-frame in `frame-src` 
+to avoid issues with $sce.insecure when using external images.
+
 ## 1.1.2
 - add class animation-play when the animation starts 
 - remove anim-frame elements on img insert
