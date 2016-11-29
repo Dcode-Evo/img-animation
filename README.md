@@ -30,11 +30,20 @@ app = angular.module('testApp', [
 	...
 	<div class="anim" img-animation duration="2500" start="startAnim">
 		<img class="static" src="images/0001.png" alt=" "/>
-		<anim-frame ng-repeat="n in [] | animFrames:42" frame-src="{{ 'images/' + n + '.png'}}"></anim-frame>
+		<anim-frame ng-repeat="n in [] | animFrames:42" frame-src="images/{{n}}.png"></anim-frame>
 	</div>
 	...
 </body>
 
+```
+
+#### cdnify alternative
+
+```html
+<div class="anim" img-animation duration="2500" start="startAnim">
+	<img class="static" src="images/0001.png" alt=" "/>
+	<anim-frame ng-repeat="n in [] | animFrames:42" path="images/" frame="{{n}}.png"></anim-frame>
+</div>
 ```
 
 ### 3. CSS
@@ -57,7 +66,7 @@ $img-height: 200px;
         left: 0;
         width: $img-width; // the size of the image:
         height: $img-height; // you have to set it to avoid the browser to recalculate all on each frame
-        @include translate(0, $img-height);
+        @include translate(0, $img-height); // using translate for significant perf gain
 
         &.active, &.static { // active/visible frame
             @include translate(0,0);
@@ -100,3 +109,11 @@ In case of the ng-repeat use your images has to be named with the following patt
 - _whatever_0001.png (for the first frame)
 - ...
 - _whatever_0042.png
+
+#### attributes
+- `<anim-frame>` element has to take `frame-src` instead of `src` and angular will try to access the `src` url while
+processing and will have security issues if sources are from another domain
+- `path` and `frame` are the alternative to `frame-src`
+  - `path="images/animation/" frame="{{n}}.png"`
+  - usefull if you want use `grunt-cdnify` as it urlizes the `{{}}` symbols
+  	- options -> `'anim-frame': 'path'`

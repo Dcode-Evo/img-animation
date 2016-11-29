@@ -114,7 +114,21 @@
 				restrict: 'E',
 				require: "^imgAnimation",
 				link: function postLink(scope, element, attrs, imgAnimationCtrl) {
-					attrs.src = attrs.frameSrc;
+
+					if(attrs.hasOwnProperty('frameSrc') && attrs.frameSrc) {
+						attrs.src = attrs.frameSrc;
+					}
+					else {
+						var path = attrs.hasOwnProperty('path') ? attrs.path : '',
+							frame = attrs.hasOwnProperty('frame') ? attrs.frame : '';
+
+						if(path.length && path.slice(-1) !== '/') {
+							path = path + '/';
+						}
+
+						attrs.src = path + frame;
+					}
+
 					imgAnimationCtrl.addImage(attrs);
 					element.remove();
 				}
